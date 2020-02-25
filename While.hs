@@ -25,7 +25,7 @@ import Prelude hiding (GT, LT)
 -- After refactoring to remove the possibility of type errors:
 
 data Expr
-   = Get
+   = Get String
    | Lit Int
    | Add Expr Expr
   deriving (Eq,Show)
@@ -37,10 +37,12 @@ data Test
    | GT  Expr Expr
    | EQU Expr Expr
    | NEQ Expr Expr
+   | Isset String
   deriving (Eq,Show)
 
 data Stmt
-   = Set Expr
+   = Set String Expr
+   | Mutate String Expr
    | While Test Stmt
    | If    Test Stmt Stmt
    | Begin [Stmt]
@@ -58,7 +60,9 @@ data Stmt
 -- * Semantics
 --
 
-type Reg = Int
+type VarName = String
+type Var = (VarName, Int)
+type Vars = [Var]
 
 -- Before refactoring:
 --   expr: Reg -> Maybe (Either Int Bool)
@@ -70,26 +74,39 @@ type Reg = Int
 --   stmt: Reg -> Reg
 
 -- | Valuation function for expressions.
-expr :: Expr -> Reg -> Int
-expr Get       s = s
+expr :: Expr -> Vars -> Int
+expr (Get s) [] = 0
+expr (Get s) (v : vv) = case v of
+                        (n, i) -> if s == n then i else expr (Get s) vv
 expr (Lit i)   s = i
 expr (Add l r) s = expr l s + expr r s
 
 -- | Valuation function for tests.
-test :: Test -> Reg -> Bool
+test :: Test -> Vars -> Bool
 test (LTE l r) s = expr l s <= expr r s
 test (LT l r) s  = expr l s <  expr r s
 test (GTE l r) s = expr l s >= expr r s
 test (GT l r) s  = expr l s >  expr r s
 test (EQU l r) s = expr l s == expr r s
 test (NEQ l r) s = expr l s /= expr r s
+test (Isset ss) [] = False
+test (Isset ss) (r : rr) = case r of
+                             (n, i) -> if n == ss then True else test (Isset ss) rr 
 
 -- | Valuation function for statements.
-stmt :: Stmt -> Reg -> Reg
-stmt (Set e)     s = expr e s
+stmt :: Stmt -> Vars -> Vars
+stmt (Set r e) s   = if (test (Isset r) s) == False then (r, (expr e s)) : s else s 
+stmt (Mutate r e) s = map (\x -> if (fst x) == r then (r, (expr e s)) else x) s
 stmt (While c b) s = if test c s then stmt (While c b) (stmt b s) else s
 stmt (If c t e) s  = if test c s then stmt t s else stmt e s
 stmt (Begin ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
     stmts []     r = r
     stmts (s:ss) r = stmts ss (stmt s r)
+
+--compares two string return true if they are equal, else false
+strcmp :: String -> String -> Bool
+strcmp [] [] = True
+strcmp a [] = False
+strcmp [] a = False
+strcmp (x:xs) (s:ss) = if ( x == s ) then strcmp xs ss else False
