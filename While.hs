@@ -1,6 +1,8 @@
 -- | A single register imperative language.
 module While where
 
+import Prelude hiding (GT, LT)
+
 
 --
 -- * Syntax
@@ -29,12 +31,18 @@ data Expr
   deriving (Eq,Show)
 
 data Test
-   = LTE Expr Expr
+   = LTE Expr Expr 
+   | LT  Expr Expr
+   | GTE Expr Expr
+   | GT  Expr Expr
+   | EQU Expr Expr
+   | NEQ Expr Expr
   deriving (Eq,Show)
 
 data Stmt
    = Set Expr
    | While Test Stmt
+   | If    Test Stmt Stmt
    | Begin [Stmt]
   deriving (Eq,Show)
 
@@ -48,9 +56,10 @@ data Stmt
 
 p :: Stmt
 p = Begin
-      [ Set (Lit 1)
-      , While (LTE Get (Lit 100))
-          (Set (Add Get Get))
+      [ Set (Lit 7),
+        If  (EQU Get (Lit 8))
+               (Set(Lit 9))
+               (Set(Lit 11))
       ]
 
 --
@@ -77,11 +86,17 @@ expr (Add l r) s = expr l s + expr r s
 -- | Valuation function for tests.
 test :: Test -> Reg -> Bool
 test (LTE l r) s = expr l s <= expr r s
+test (LT l r) s  = expr l s <  expr r s
+test (GTE l r) s = expr l s >= expr r s
+test (GT l r) s  = expr l s >  expr r s
+test (EQU l r) s = expr l s == expr r s
+test (NEQ l r) s = expr l s /= expr r s
 
 -- | Valuation function for statements.
 stmt :: Stmt -> Reg -> Reg
 stmt (Set e)     s = expr e s
 stmt (While c b) s = if test c s then stmt (While c b) (stmt b s) else s
+stmt (If c t e) s  = if test c s then stmt t s else stmt e s
 stmt (Begin ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
     stmts []     r = r
