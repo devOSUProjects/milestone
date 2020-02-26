@@ -25,7 +25,7 @@ import Prelude hiding (GT, LT)
 -- After refactoring to remove the possibility of type errors:
 
 data Expr
-   = Get String
+   = Get VarName
    | Lit Int
    | Add Expr Expr
   deriving (Eq,Show)
@@ -41,8 +41,8 @@ data Test
   deriving (Eq,Show)
 
 data Stmt
-   = Set String Expr
-   | Mutate String Expr
+   = Set VarName Expr
+   | Mutate VarName Expr
    | While Test Stmt
    | If    Test Stmt Stmt
    | Begin [Stmt]
