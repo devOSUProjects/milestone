@@ -37,7 +37,7 @@ data Test
    | GT  Expr Expr
    | EQU Expr Expr
    | NEQ Expr Expr
-   | Isset String
+   | Isset VarName
   deriving (Eq,Show)
 
 data Stmt
