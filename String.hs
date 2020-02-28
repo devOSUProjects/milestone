@@ -1,4 +1,4 @@
-modile String where
+module String where
 
 import While
 
