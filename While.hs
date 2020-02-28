@@ -104,9 +104,5 @@ stmt (Begin ss)  s = stmts ss s  -- foldl (flip stmt) s ss
     stmts []     r = r
     stmts (s:ss) r = stmts ss (stmt s r)
 
---compares two string return true if they are equal, else false
-strcmp :: String -> String -> Bool
-strcmp [] [] = True
-strcmp a [] = False
-strcmp [] a = False
-strcmp (x:xs) (s:ss) = if ( x == s ) then strcmp xs ss else False
+
+
