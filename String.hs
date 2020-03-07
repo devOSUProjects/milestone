@@ -1,6 +1,6 @@
 module String where
 
-import While
+import Pear
 
 --This currently includes operations for manipulating strings for our language
 -- Currently we have
