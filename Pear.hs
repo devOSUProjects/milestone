@@ -84,17 +84,17 @@ expr (Isset ss) ((n, i) : rr) = if n == ss then Just (Bval True) else expr (Isse
 -- | Valuation function for statements.
 stmt :: Stmt -> Vars -> Vars
 stmt (Set r e) s   = case expr e s of
-                     Just val -> if (expr (Isset r) s) == (Just (Bval False)) then (r, val) : s else s
-                     Nothing  -> s
+                     Just val -> if (expr (Isset r) s) == (Just (Bval False)) then (r, val) : s else error "Error: Value already set. You must mutate set variables"
+                     Nothing  -> error "Error: Type error in code"
 stmt (Mutate r e) s = case expr e s of
                       Just val -> map (\x -> if (fst x) == r then (r, val) else x) s
-                      Nothing  -> s
+                      Nothing  -> error "Error: Type error in code"
 stmt (If c t e) s  = case expr c s of
                      Just (Bval b) -> if b == True then stmt t s else stmt e s
-                     _             -> s
+                     _             -> error "Error: Type error in code"
 stmt (While c t) s = case expr c s of
                      Just (Bval b) -> if b == True then stmt (While c t) (stmt t s) else s
-                     _             -> s
+                     _             -> error "Error: Type error in code"
 stmt (Prog ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
     stmts []     r = r
