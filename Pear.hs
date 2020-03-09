@@ -88,7 +88,6 @@ expr (Isset ss) ((n, i) : rr) = if n == ss then Just (Bval True) else expr (Isse
 expr (App a) s = case lookup a s of
                    Just (Fval a')  -> expr (snd a') s
                    _       -> Nothing
-                  
 
 -- | Valuation function for statements.
 stmt :: Stmt -> Vars -> Vars
@@ -104,16 +103,7 @@ stmt (If c t e) s  = case expr c s of
 stmt (While c t) s = case expr c s of
                      Just (Bval b) -> if b == True then stmt (While c t) (stmt t s) else s
                      _             -> error "Error: Type error in code"
-
-
 stmt (Func a b e) s = stmt (Set a (Val (Fval (b, e)))) s
-
-
-
-
-
-
-
 stmt (Prog ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
     stmts []     r = r
