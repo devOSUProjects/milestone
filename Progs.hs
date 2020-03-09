@@ -32,3 +32,10 @@ ex3 = Prog
       ]
 
 
+ex4 :: Stmt
+ex4 = Prog
+      [
+         Func "exampleFunc" "Param1" (Add (Get "Param1") (Get "Param1")),
+         Set "Param1" (Val (Ival 4)),
+         Set "funcOutput" (App "exampleFunc") 
+      ]
