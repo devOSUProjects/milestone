@@ -1,7 +1,5 @@
 module String where
 
-import Pear
-
 --This currently includes operations for manipulating strings for our language
 -- Currently we have
 --		a. String Compare
@@ -17,11 +15,16 @@ strcmp [] a = False
 strcmp (x:xs) (s:ss) = if ( x == s ) then strcmp xs ss else False
 
 --when given two strings it will concatenate them
+{-
 strcat :: [[a]] -> [[a]] -> [[a]]
 strcat [] _ = []
 strcat _ [] = []
 strcat (x:xs) (y:ys) = (x ++ y) : strcat xs ys
 
+-}
+
+strcat :: [Char] -> [Char] -> [Char]
+strcat x y = x ++ y
 --Returns the number of words in a word list (String)
 wordcount :: String -> Int
 wordcount = length . words

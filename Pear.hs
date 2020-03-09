@@ -1,5 +1,6 @@
 module Pear where
 import Prelude hiding (GT, LT)
+import String
 
 
 --
@@ -25,7 +26,9 @@ data Expr
    | Add Expr Expr
    | LT  Expr Expr
    | GT  Expr Expr
-   | EQU  Expr Expr
+   | EQU Expr Expr
+   | Cat Expr Expr
+   | WC  Expr
    | Isset VarName
   deriving (Eq,Show)
 
@@ -68,6 +71,12 @@ expr (LT l r) s = case (expr l s, expr r s) of
                         _                              -> Nothing
 expr (EQU l r) s = case (expr l s, expr r s) of
                         (Just (Ival x), Just (Ival y)) -> if x == y then Just (Bval True) else Just (Bval False)
+                        _                              -> Nothing
+expr (Cat l r) s = case (expr l s, expr r s) of
+                        (Just (Sval x), Just (Sval y)) -> Just (Sval (strcat x y))
+                        _                              -> Nothing
+expr (WC e) s = case expr e s of
+                        Just (Sval x) -> Just (Ival (wordcount x))
                         _                              -> Nothing
 expr (Isset ss) [] = Just (Bval False)
 expr (Isset ss) ((n, i) : rr) = if n == ss then Just (Bval True) else expr (Isset ss) rr 
