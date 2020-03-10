@@ -24,6 +24,9 @@ data Expr
    = Get VarName
    | Val Value
    | Add Expr Expr
+   | Sub Expr Expr
+   | Mul Expr Expr
+   | Div Expr Expr
    | LT  Expr Expr
    | GT  Expr Expr
    | EQU Expr Expr
@@ -35,6 +38,7 @@ data Expr
 data Stmt
    = Set VarName Expr
    | Mutate VarName Expr
+   | Inc VarName
    | While Expr Stmt
    | If    Expr Stmt Stmt
    | Deffunc  VarName ParamName Stmt  --
@@ -80,6 +84,16 @@ expr (Get s) ((n, i) : vv) = if s == n then Just i else expr (Get s) vv
 expr (Add l r) s = case (expr l s, expr r s) of
                         (Just (Ival x), Just (Ival y)) -> Just (Ival (x + y))
                         _                              -> Nothing
+expr (Sub l r) s = case (expr l s, expr r s) of
+                        (Just (Ival x), Just (Ival y)) -> Just (Ival (x - y))
+                        _                              -> Nothing
+expr (Mul l r) s = case (expr l s, expr r s) of
+                        (Just (Ival x), Just (Ival y)) -> Just (Ival (x * y))
+                        _                              -> Nothing
+expr (Div l r) s = case (expr l s, expr r s) of
+                        (Just (Ival _), Just (Ival 0)) -> error "Error: Divide by zero"
+                        (Just (Ival x), Just (Ival y)) -> Just (Ival (x `div` y))
+                        _                              -> Nothing
 expr (GT l r) s = case (expr l s, expr r s) of
                         (Just (Ival x), Just (Ival y)) -> if x > y then Just (Bval True) else Just (Bval False)
                         _                              -> Nothing
@@ -106,6 +120,9 @@ stmt (Set r e) s   = case expr e s of
 stmt (Mutate r e) s = case expr e s of
                       Just val -> map (\x -> if (fst x) == r then (r, val) else x) s
                       Nothing  -> error "Error: Type error in code"
+stmt (Inc r) s      = case expr (Get r) s of
+                        Just (Ival a)                  -> stmt (Mutate r (Val (Ival (a + 1)))) s
+                        _                              -> error "Error: Type error in code"
 stmt (If c t e) s  = case expr c s of
                      Just (Bval b) -> if b == True then stmt t s else stmt e s
                      _             -> error "Error: Type error in code"
@@ -129,7 +146,7 @@ filtervarlist (_, Fval _) = False
 filtervarlist _ = True
 
 beginprog :: [Stmt] -> Vars
-beginprog ss = filter (\x -> (filtervarlist x))  (stmt (Prog ss) [])
+beginprog ss = filter (\x -> (filtervarlist x))  (stmt (Prog ss) [("counter", (Ival 0))])
 
 
 

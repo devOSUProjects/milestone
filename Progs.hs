@@ -2,6 +2,7 @@ module Progs where
 
 import Pear
 import Prelude hiding (GT, LT)
+import Libraries
 
 --String Examples
 ex1 :: [Stmt]
@@ -39,4 +40,18 @@ ex4 =
           Deffunc "func1" "param1" (Prog [Mutate "hello kitty" (Add (Get "param1") (int 4))]),
           Call "func1" (int 3),
           Call "func1" (int 8)
+      ]
+--Won't divide by zero
+ex5 :: [Stmt]
+ex5 = 
+      [
+          Set "baz" (Div (int 19) (int 0))
+      ]
+
+--Example use of for loop. adds 2 to test 5 times resulting in 10
+ex6 :: [Stmt]
+ex6 = 
+      [
+         Set "test" (int 0),
+         for (int 5) (Mutate "test" (Add (Get "test") (int 2)))
       ]
