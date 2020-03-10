@@ -4,8 +4,8 @@ import Pear
 import Prelude hiding (GT, LT)
 
 --String Examples
-ex1 :: Stmt
-ex1 = Prog
+ex1 :: [Stmt]
+ex1 = 
       [
          Set "blah" (Val(Ival 33)),
          If (GT (Val (Ival 7)) (Val (Ival 5))) 
@@ -14,28 +14,29 @@ ex1 = Prog
       ]
 
 --String Examples
-ex2 :: Stmt
-ex2 = Prog
+ex2 :: [Stmt]
+ex2 = 
       [
          Set "String1" (Val (Sval "Hello ")),
-         Set "String2" (Val (Sval "Doc")),
+         Set "String2" (Val (Sval "World")),
          Set "String3" (Cat (Get "String1")(Get "String2")),
          Set "WordCount" (WC (Get "String3"))
       ]
 
 --Error example
-ex3 :: Stmt
-ex3 = Prog
+ex3 :: [Stmt]
+ex3 = 
       [
          Set "hey" (Val(Ival 3)),
          Set "hey" (Val(Ival 4))
       ]
 
-
-ex4 :: Stmt
-ex4 = Prog
+--Function example
+ex4 :: [Stmt]
+ex4 = 
       [
-         Func "exampleFunc" "Param1" (Add (Get "Param1") (Get "Param1")),
-         Set "Param1" (Val (Ival 4)),
-         Set "funcOutput" (App "exampleFunc") 
+          Set "hello kitty" (Val (Ival 3)),
+          Deffunc "func1" "param1" (Prog [Mutate "hello kitty" (Add (Get "param1") (Val (Ival 4)))]),
+          Call "func1" (Ival 2),
+          Call "func1" (Ival 7)
       ]
