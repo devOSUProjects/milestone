@@ -55,3 +55,12 @@ ex6 =
          Set "test" (int 0),
          for (int 5) (Mutate "test" (Add (Get "test") (int 2)))
       ]
+--Example of using lists
+ex7 :: [Stmt]
+ex7 = 
+      [
+         Set "test" (array [Ival 1, Sval "testing strings", Bval False]),
+         Set "anothertest" (Index "test" (int (1))),
+         Set "test2" (array [Ival 1, Ival 2, Ival 3]),
+         Set "NewList" (ConcatLists (Get "test") (Get "test2"))
+      ]
