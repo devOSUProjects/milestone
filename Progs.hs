@@ -7,18 +7,18 @@ import Prelude hiding (GT, LT)
 ex1 :: [Stmt]
 ex1 = 
       [
-         Set "blah" (Val(Ival 33)),
-         If (GT (Val (Ival 7)) (Val (Ival 5))) 
-         (Set "Hollyfield" (Add (Val (Ival 1)) (Get "blah")))
-         (Set "Hollyfield" (Add (Val (Ival 19)) (Val ((Ival 5)))))
+         Set "blah" (int 33),
+         If (GT (int 7) (int 8)) 
+         (Set "Hollyfield" (Add (int 1) (Get "blah")))
+         (Set "Hollyfield" (Add (int 19) (int 6)))
       ]
 
 --String Examples
 ex2 :: [Stmt]
 ex2 = 
       [
-         Set "String1" (Val (Sval "Hello ")),
-         Set "String2" (Val (Sval "World")),
+         Set "String1" (string "World"),
+         Set "String2" (string "World"),
          Set "String3" (Cat (Get "String1")(Get "String2")),
          Set "WordCount" (WC (Get "String3"))
       ]
@@ -27,16 +27,16 @@ ex2 =
 ex3 :: [Stmt]
 ex3 = 
       [
-         Set "hey" (Val(Ival 3)),
-         Set "hey" (Val(Ival 4))
+         Set "hey" (int 3),
+         Set "hey" (int 3)
       ]
 
 --Function example
 ex4 :: [Stmt]
 ex4 = 
       [
-          Set "hello kitty" (Val (Ival 3)),
-          Deffunc "func1" "param1" (Prog [Mutate "hello kitty" (Add (Get "param1") (Val (Ival 4)))]),
-          Call "func1" (Ival 2),
-          Call "func1" (Ival 7)
+          Set "hello kitty" (int 3),
+          Deffunc "func1" "param1" (Prog [Mutate "hello kitty" (Add (Get "param1") (int 4))]),
+          Call "func1" (int 3),
+          Call "func1" (int 8)
       ]

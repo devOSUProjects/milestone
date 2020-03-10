@@ -38,7 +38,7 @@ data Stmt
    | While Expr Stmt
    | If    Expr Stmt Stmt
    | Deffunc  VarName ParamName Stmt  --
-   | Call VarName Value
+   | Call VarName Expr
    | Prog [Stmt]
   deriving (Eq,Show)
 
@@ -49,6 +49,18 @@ data Value
    | Fval (ParamName, Stmt)
   deriving (Eq,Show)
 
+
+--
+-- * Syntactic Sugar
+--
+int :: Int -> Expr
+int x = Val (Ival x) 
+
+string :: String -> Expr
+string x = Val (Sval x) 
+
+bool :: Bool -> Expr
+bool x = Val (Bval x) 
 
 --
 -- * Semantics
@@ -103,7 +115,7 @@ stmt (While c t) s = case expr c s of
 stmt (Deffunc a b e) s = stmt (Prog [Set a (Val (Fval (b, e))), Set b (Val (Sval ""))]) s
 
 stmt (Call a e)   s = case lookup a s of
-                        Just (Fval (f, g)) -> stmt (Prog [Mutate f (Val e), g]) s
+                        Just (Fval (f, g)) -> stmt (Prog [Mutate f e, g]) s
                         _                  -> error "Error: Type error in code"
 stmt (Prog ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
