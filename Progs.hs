@@ -59,8 +59,10 @@ ex6 =
 ex7 :: [Stmt]
 ex7 = 
       [
-         Set "test" (array [Ival 1, Sval "testing strings", Bval False]),
+         Set "test" (list [Ival 1, Sval "testing strings", Bval False]),
          Set "anothertest" (Index "test" (int (1))),
-         Set "test2" (array [Ival 1, Ival 2, Ival 3]),
-         Set "NewList" (ConcatLists (Get "test") (Get "test2"))
+         Set "test2" (list [Ival 1, Ival 2, Ival 3]),
+         Set "NewList" (ConcatLists (Get "test") (Get "test2")),
+         Set "??????" (GetListInts (Get "NewList")),
+         Set "onlystrings" (GetListStrings (Get "NewList"))
       ]
