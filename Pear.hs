@@ -2,24 +2,6 @@ module Pear where
 import Prelude hiding (GT, LT)
 import String
 
-
---
--- * Syntax
---
---    Int ::= (any integer)
---    String ::= (any String)
---    Bool ::= True | False
---
---    expr ::= `R`                  -- load from register
---          |  int                  -- integer literal
---          |  expr `+` expr        -- addition expression
---          |  expr `≤` expr        -- less than or equal to
---
---    stmt ::= `R :=` expr          -- set register
---          |  `while` expr stmt    -- while loop
---          |  `begin` stmt* `end`  -- statement block
---
-
 data Expr
    = Get VarName
    | Val Value
