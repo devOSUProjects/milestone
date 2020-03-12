@@ -30,6 +30,7 @@ data Expr
    | LT  Expr Expr
    | GT  Expr Expr
    | EQU Expr Expr
+   | Not Expr
    | Cat Expr Expr
    | WC  Expr
    | Index VarName Expr
@@ -47,6 +48,7 @@ data Stmt
    | If    Expr Stmt Stmt
    | Deffunc  VarName ParamName Stmt  --
    | Call VarName Expr
+   | Return Expr
    | Prog [Stmt]
   deriving (Eq,Show)
 
@@ -74,8 +76,9 @@ bool x = Val (Bval x)
 list :: [Value] -> Expr
 list x = Val (Aval x)
 
+
 -- Filters everything except Ints
-filterints:: Value -> Bool
+filterints :: Value -> Bool
 filterints (Ival _) = True
 filterints _ = False
 
@@ -83,6 +86,14 @@ filterints _ = False
 filterstrings :: Value -> Bool
 filterstrings (Sval _) = True
 filterstrings _ = False
+
+--
+-- Syntatic Sugar
+--
+-- for function runs given statement for given int amount of times
+
+for :: Expr -> Stmt -> Stmt
+for a b = Prog [Mutate "counter" (int 0), While (LT (Get "counter") (a)) (Prog [Inc "counter", b])]           
 
 --
 -- * Semantics
@@ -123,6 +134,9 @@ expr (LT l r) s = case (expr l s, expr r s) of
                         _                              -> Nothing
 expr (EQU l r) s = case (expr l s, expr r s) of
                         (Just (Ival x), Just (Ival y)) -> if x == y then Just (Bval True) else Just (Bval False)
+                        _                              -> Nothing
+expr (Not e) s = case expr e s of
+                        (Just (Bval y)) -> if y == True then Just (Bval False) else Just (Bval True)
                         _                              -> Nothing
 expr (Cat l r) s = case (expr l s, expr r s) of
                         (Just (Sval x), Just (Sval y)) -> Just (Sval (strcat x y))
@@ -167,6 +181,10 @@ stmt (Deffunc a b e) s = stmt (Prog [Set a (Val (Fval (b, e))), Set b (Val (Sval
 stmt (Call a e)   s = case lookup a s of
                         Just (Fval (f, g)) -> stmt (Prog [Mutate f e, g]) s
                         _                  -> error "Error: Type error in code in Call statement"
+
+stmt (Return e)   s = case expr e s of
+                        Just val -> stmt (Mutate "output" (Val val)) s
+                        _        -> error "Error: Type error in code in Return statement"
 stmt (Prog ss)  s = stmts ss s  -- foldl (flip stmt) s ss
   where
     stmts []     r = r
@@ -178,4 +196,4 @@ filtervarlist (_, Fval _) = False
 filtervarlist _ = True
 
 run :: [Stmt] -> Vars
-run ss = filter (\x -> (filtervarlist x))  (stmt (Prog ss) [("counter", (Ival 0))])
+run ss = filter (\x -> (filtervarlist x))  (stmt (Prog ss) [("counter", Sval ""), ("output", Sval "")])

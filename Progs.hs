@@ -41,12 +41,6 @@ ex4 =
           Call "func1" (int 3),
           Call "func1" (int 8)
       ]
---Won't divide by zero
-ex5 :: [Stmt]
-ex5 = 
-      [
-          Set "baz" (Div (int 19) (int 0))
-      ]
 
 --Example use of for loop. adds 2 to test 5 times resulting in 10
 ex6 :: [Stmt]
@@ -66,3 +60,44 @@ ex7 =
          Set "??????" (GetListInts (Get "NewList")),
          Set "onlystrings" (GetListStrings (Get "NewList"))
       ]
+
+--Example of using Not expression
+ex8 :: [Stmt]
+ex8 = 
+      [
+         Set "x" (int (2)),
+         Set "y" (int (3)),
+         If (Not (GT (Get "x") (Get "y")))
+         (Set "z" (string "Test successful"))
+         (Set "z" (string "Test unsuccesful"))
+      ]
+
+
+
+goodexample1 :: [Stmt]
+goodexample1 =
+               [
+                  Set "goodexample1" (int 2),
+                  for (int 19) (Mutate "goodexample1" (Mul (Get "goodexample1") (int 2)))
+               ]
+
+goodexample2 :: [Stmt]
+goodexample2 =
+               [
+                  Set "String1" (string "We "),
+                  Set "String2" (string "Love "),
+                  Set "String3" (string "Our "),
+                  Set "String4" (string "Grading "),
+                  Set "String5" (string "Ta."),
+                  Set "x" (Cat (Get "String4") (Get "String5")),
+                  Set "y" (Cat (Get "String2") (Get "String3")),
+                  Set "z" (Cat (Get "y") (Get "x")),
+                  Set "finaloutput" (Cat (Get "String1") (Get "z"))
+               ]
+--
+--Won't divide by zero
+badexample :: [Stmt]
+badexample = 
+              [
+                  Set "baz" (Div (int 19) (int 0))
+              ]
