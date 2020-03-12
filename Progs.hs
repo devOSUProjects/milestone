@@ -49,7 +49,7 @@ ex6 =
          Set "test" (int 0),
          for (int 5) (Mutate "test" (Add (Get "test") (int 2)))
       ]
---Example of using lists
+--Example of using lists, concating lists, and getting only Ints or Strigns from a list
 ex7 :: [Stmt]
 ex7 = 
       [
@@ -96,8 +96,20 @@ goodexample2 =
                ]
 --
 --Won't divide by zero
-badexample :: [Stmt]
-badexample = 
+badexample1 :: [Stmt]
+badexample1 = 
               [
                   Set "baz" (Div (int 19) (int 0))
+              ]
+
+badexample2 :: [Stmt]
+badexample2 = 
+              [
+                  Set "baz" (Add (bool (False)) (bool (True)))
+              ]
+
+badexample3 :: [Stmt]
+badexample3 = 
+              [
+                  If (int 0) (Set "x" (int 3)) (Set "y" (int 3))
               ]
